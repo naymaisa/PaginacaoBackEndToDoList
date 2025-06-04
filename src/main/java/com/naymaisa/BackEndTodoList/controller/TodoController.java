@@ -2,13 +2,17 @@ package com.naymaisa.BackEndTodoList.controller;
 
 import com.naymaisa.BackEndTodoList.model.Todo;
 import com.naymaisa.BackEndTodoList.repository.TodoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/todos/api")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class TodoController {
 
     private final TodoRepository repository;
@@ -21,6 +25,16 @@ public class TodoController {
     public List<Todo> getAll(){
         return repository.findAll();
     }
+
+    @GetMapping("/paginated")
+    public Page<Todo> getPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("task").ascending());
+        return repository.findAll(pageable);
+    }
+
     @PostMapping
     public  Todo create(@RequestBody Todo todo){
         return  repository.save((todo));
